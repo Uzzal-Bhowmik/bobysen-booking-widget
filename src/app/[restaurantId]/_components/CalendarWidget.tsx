@@ -10,12 +10,13 @@ import {
   startOfMonth,
   getDay,
   getDaysInMonth,
+  isBefore,
 } from "date-fns";
 import { cn } from "@/lib/utils";
 
 type ComponentProps = {
-  selectedDate?: number;
-  setSelectedDate: Dispatch<SetStateAction<number | undefined>>;
+  selectedDate?: Date | null;
+  setSelectedDate: Dispatch<SetStateAction<Date | null>>;
   time: string;
   setTime: Dispatch<SetStateAction<string>>;
   guests: number;
@@ -35,7 +36,7 @@ export default function CalendarWidget({
   // Get days in current month
   const daysInMonth = getDaysInMonth(currentDate);
   const startDay = getDay(startOfMonth(currentDate)); // Get day of week for first day
-  const padding = Array.from({ length: startDay }, (_, i) => null);
+  const padding = Array.from({ length: startDay }, () => null);
 
   const handleMonthChange = (direction: "prev" | "next") => {
     setCurrentDate((prev) =>
@@ -62,11 +63,13 @@ export default function CalendarWidget({
   };
 
   const handleDateSelect = (day: number) => {
-    setSelectedDate(day);
+    setSelectedDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth(), day),
+    );
   };
 
   return (
-    <div className="w-full rounded-lg border bg-white p-6 pb-2 text-gray-900 shadow-sm">
+    <div className="w-full rounded-lg border bg-white p-6 pb-2 text-gray-900 shadow-sm select-none">
       {/* Calendar Header */}
       <div className="mb-8 flex items-center justify-between">
         <ChevronLeft
@@ -95,24 +98,51 @@ export default function CalendarWidget({
         {[
           ...padding,
           ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-        ].map((day, index) => (
-          <div
-            key={index}
-            onClick={() => day && handleDateSelect(day)}
-            className={cn(
-              "flex aspect-square size-12 items-center justify-center rounded-full text-sm transition-colors duration-200",
-              day && "cursor-pointer",
-              day &&
-                day !== selectedDate &&
-                day !== currentDate.getDate() &&
-                "hover:bg-gray-200",
-              day === currentDate.getDate() ? "bg-black/85 text-white" : "",
-              day === selectedDate ? "bg-secondary-3 text-white" : "",
-            )}
-          >
-            {day}
-          </div>
-        ))}
+        ].map((day, index) => {
+          const today = new Date();
+
+          // Check if the date is today
+          const isToday =
+            today.getFullYear() === currentDate.getFullYear() &&
+            today.getMonth() === currentDate.getMonth() &&
+            day === today.getDate();
+
+          // Find out all the previous days for disabling
+          const date = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            day as number,
+          );
+          const isPast = isBefore(date, today.setHours(0, 0, 0, 0)); // Check if it's before today
+
+          return (
+            <button
+              key={index}
+              onClick={() => day && handleDateSelect(day)}
+              className={cn(
+                "flex aspect-square size-12 items-center justify-center rounded-full text-sm transition-colors duration-200 disabled:text-gray-300",
+                day && "cursor-pointer",
+                day &&
+                  day !== selectedDate?.getDate() &&
+                  day !== currentDate.getDate() &&
+                  "hover:bg-gray-200",
+
+                isToday && selectedDate === undefined
+                  ? "bg-secondary-3 text-white"
+                  : "",
+                selectedDate?.getDate() === day
+                  ? "bg-secondary-3 text-white"
+                  : "",
+                isToday && selectedDate?.getDate() !== day
+                  ? "bg-black/85 text-white"
+                  : "",
+              )}
+              disabled={isPast}
+            >
+              {day}
+            </button>
+          );
+        })}
       </div>
 
       {/* Guests Selector */}

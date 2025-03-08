@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,7 +18,6 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { getNodeEnv } from "@/config/envConfig";
 import CalendarWidget from "./CalendarWidget";
-import { format } from "date-fns";
 import RestaurantOpeningHours from "./RestaurantOpeningHours";
 
 type FormLabelWithSuffixProps = {
@@ -40,16 +38,14 @@ const formSchema = z.object({
     .string({ required_error: "Email is required" })
     .min(1, "Email is required")
     .email({ message: "Invalid email" }),
-  phoneNumber: z
-    .string({ required_error: "Phone number is required" })
-    .min(1, "Phone number is required"),
-  // getNodeEnv() === "development"
-  //   ? z
-  //       .string({ required_error: "Phone number is required" })
-  //       .min(1, "Phone number is required")
-  //   : z
-  //       .string({ required_error: "Phone number is required" })
-  //       .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+  phoneNumber:
+    getNodeEnv() === "development"
+      ? z
+          .string({ required_error: "Phone number is required" })
+          .min(1, "Phone number is required")
+      : z
+          .string({ required_error: "Phone number is required" })
+          .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
 });
 
 export default function BookingForm() {
@@ -65,12 +61,20 @@ export default function BookingForm() {
   const formSubmitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Calender widget values
-  const [selectedDate, setSelectedDate] = useState<number>();
-  const [time, setTime] = useState<string>(format(new Date(), "HH:mm"));
-  const [guests, setGuests] = useState<number>(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [time, setTime] = useState<string>("15:00");
+  const [guests, setGuests] = useState<number>(1);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    // Payload
+    const payload = {
+      ...values,
+      date: selectedDate,
+      time,
+      guests,
+    };
+
+    console.log(payload);
   };
 
   return (

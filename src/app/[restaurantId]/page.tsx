@@ -9,6 +9,7 @@ type PageProps = {
 
 export default async function BookRestaurant({ params }: PageProps) {
   const { restaurantId } = await params;
+  console.log({ restaurantId });
 
   return (
     <div className="mt-6 mb-10">
