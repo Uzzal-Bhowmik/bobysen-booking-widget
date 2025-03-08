@@ -131,7 +131,7 @@ export default function CalendarWidget({
                   ? "bg-secondary-3 text-white"
                   : "",
                 selectedDate?.getDate() === day
-                  ? "bg-secondary-3 text-white"
+                  ? "[&:not(:disabled)]:bg-secondary-3 text-white"
                   : "",
                 isToday && selectedDate?.getDate() !== day
                   ? "bg-black/85 text-white"
