@@ -5,50 +5,17 @@ import { useState } from "react";
 
 type OpeningHour = {
   day: string;
-  openingHour: string;
-  closingHour: string;
+  openingTime: string;
+  closingTime: string;
 };
 
-// Fake opening hours
-const openingHours: OpeningHour[] = [
-  {
-    day: "Sun",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-  {
-    day: "Mon",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-  {
-    day: "Tue",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-  {
-    day: "Wed",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-  {
-    day: "Thu",
-    openingHour: "00:00",
-    closingHour: "00:00",
-  },
-  {
-    day: "Fri",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-  {
-    day: "Sat",
-    openingHour: "07:00",
-    closingHour: "23:00",
-  },
-];
+type RestaurantOpeningHoursProps = {
+  days: OpeningHour[];
+};
 
-export default function RestaurantOpeningHours() {
+export default function RestaurantOpeningHours({
+  days,
+}: RestaurantOpeningHoursProps) {
   const [showOpeningHours, setShowOpeningHours] = useState<boolean>(false);
 
   return (
@@ -83,19 +50,19 @@ export default function RestaurantOpeningHours() {
         <div className="mt-2 mb-5 h-[0.5px] w-full bg-gray-300" />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5">
-          {openingHours.map((dayTime: OpeningHour, index: number) => (
+          {days?.map((dayTime: OpeningHour, index: number) => (
             <div
               key={index}
               className="flex items-center justify-between rounded-sm bg-white px-4 py-1.5 text-sm text-black"
             >
-              <p>{dayTime.day}</p>
+              <p className="capitalize">{dayTime.day}</p>
 
-              {dayTime?.openingHour !== "00:00" &&
-              dayTime?.closingHour !== "00:00" ? (
+              {dayTime?.openingTime !== "00:00" &&
+              dayTime?.closingTime !== "00:00" ? (
                 <div className="flex items-center gap-x-3">
-                  <p>{dayTime.openingHour}</p>
+                  <p>{dayTime.openingTime}</p>
                   <p>-</p>
-                  <p>{dayTime.closingHour}</p>
+                  <p>{dayTime.closingTime}</p>
                 </div>
               ) : (
                 <span className="text-destructive-foreground">Closed</span>

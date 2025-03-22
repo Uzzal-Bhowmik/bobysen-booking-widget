@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +20,13 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import { getNodeEnv } from "@/config/envConfig";
 import CalendarWidget from "./CalendarWidget";
 import RestaurantOpeningHours from "./RestaurantOpeningHours";
+import { TRestaurant } from "@/types";
+import useBooking from "@/hooks/api/useBooking";
+import { setToSessionStorage } from "@/utils/sessionStorage";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
+import { format } from "date-fns";
+import VerifyOtpModal from "./VerifyOtpModal";
 
 type FormLabelWithSuffixProps = {
   children: ReactNode;
@@ -26,6 +34,13 @@ type FormLabelWithSuffixProps = {
   isOptional?: boolean;
 } & React.LabelHTMLAttributes<HTMLLabelElement>;
 
+type BookingFormProps = {
+  restaurant: TRestaurant;
+};
+
+// Motion Variants
+
+// Zod validation schema
 const formSchema = z.object({
   firstName: z
     .string()
@@ -48,7 +63,7 @@ const formSchema = z.object({
           .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
 });
 
-export default function BookingForm() {
+export default function BookingForm({ restaurant }: BookingFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,29 +74,77 @@ export default function BookingForm() {
     },
   });
   const formSubmitButtonRef = useRef<HTMLButtonElement>(null);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState<boolean>(false);
 
-  // Calender widget values
+  // User info states
+  const [countryCode, setCountryCode] = useState<string | undefined>("");
+
+  // Calender widget states
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<string>("15:00");
   const [guests, setGuests] = useState<number>(1);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Payload
-    const payload = {
-      ...values,
-      date: selectedDate,
+  // Request booking api handler
+  const [requestBookingLoading, setRequestBookingLoading] =
+    useState<boolean>(false);
+  const { requestBooking } = useBooking();
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // This payload will be used after submitting booking request
+    // and when verifying otp
+    const confirmBookingPayload = {
+      otp: "",
+      token: "",
+      phoneNumber: values.phoneNumber,
+      restaurant: restaurant._id,
+      date: format(selectedDate as Date, "yyyy-MM-dd"),
       time,
-      guests,
+      seats: guests,
+      countryCode: countryCode || "",
     };
 
-    console.log(payload);
+    try {
+      setRequestBookingLoading(true);
+
+      const res = await requestBooking({
+        fullName: `${values.firstName} ${values.lastName}`,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        countryCode: countryCode as string,
+        restaurant: restaurant?._id,
+      });
+
+      // Store payload in session storage
+      if (res?.success) {
+        confirmBookingPayload["token"] = res.data;
+
+        setToSessionStorage(
+          "booking_payload",
+          JSON.stringify(confirmBookingPayload),
+        );
+
+        setIsOtpModalOpen(true);
+        form.reset();
+      }
+    } catch (error: any) {
+      if (error?.err?.name === "ValidationError") {
+        return toast.error(error?.errorSources?.[0]?.message);
+      }
+
+      toast.error(
+        error?.message || error?.data?.message || "Something went wrong",
+      );
+    } finally {
+      setRequestBookingLoading(false);
+    }
   };
 
   return (
     <div className="space-y-3 rounded-lg border bg-white p-6 shadow-xl duration-700 lg:space-y-7">
       <div className="!mb-10 space-y-1.5 text-center">
-        <h3 className="text-secondary-1 text-[26px] font-semibold text-balance">
-          Welcome To <span className="text-secondary-3">[Restaurant Name]</span>
+        <h3 className="text-secondary-1 text-[30px] font-bold text-balance">
+          Welcome to{" "}
+          <span className="text-secondary-3">{restaurant?.name}</span>
         </h3>
         <p className="text-secondary-1/75 text-xl">
           Let&apos;s book your table.
@@ -186,6 +249,9 @@ export default function BookingForm() {
                     defaultCountry="MU"
                     international
                     placeholder="Enter your phone number"
+                    onCountryChange={(value) => {
+                      setCountryCode(value);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -213,7 +279,7 @@ export default function BookingForm() {
         </div>
 
         <div className="w-full lg:w-1/2">
-          <RestaurantOpeningHours />
+          <RestaurantOpeningHours days={restaurant?.days} />
         </div>
       </div>
 
@@ -224,9 +290,20 @@ export default function BookingForm() {
         onClick={() => {
           formSubmitButtonRef.current?.click();
         }}
+        disabled={requestBookingLoading}
       >
-        Book Now
+        {requestBookingLoading ? (
+          <span className="flex items-center justify-center gap-x-1">
+            <Loader className="mr-2 size-5 animate-spin" />
+            Please Wait...
+          </span>
+        ) : (
+          "Book Now"
+        )}
       </Button>
+
+      {/* Otp Verification Modal */}
+      <VerifyOtpModal open={isOtpModalOpen} setOpen={setIsOtpModalOpen} />
     </div>
   );
 }

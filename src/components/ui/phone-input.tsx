@@ -122,7 +122,9 @@ const CountrySelect = ({
                       country={value}
                       countryName={label}
                       selectedCountry={selectedCountry}
-                      onChange={onChange}
+                      onChange={(value) => {
+                        onChange(value);
+                      }}
                     />
                   ) : null,
                 )}

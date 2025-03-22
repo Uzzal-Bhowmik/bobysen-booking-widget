@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Kumbh_Sans, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import Providers from "@/lib/Providers";
+import BgFlowers from "@/components/BgFlowers";
 
 const kumbhSans = Kumbh_Sans({
   subsets: ["latin"],
@@ -53,7 +55,11 @@ export default function RootLayout({
       >
         <Header />
 
-        <main className="mx-auto max-w-6xl">{children}</main>
+        <Providers>
+          <main className="mx-auto max-w-6xl">{children}</main>
+        </Providers>
+
+        <BgFlowers />
       </body>
     </html>
   );
