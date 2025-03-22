@@ -7,6 +7,8 @@ type PageProps = {
   }>;
 };
 
+export const revalidate = 3600;
+
 async function fetchRestaurant(restaurantId: string) {
   const result = await fetch(
     (getBackendUrl() as string) + `/restaurants/${restaurantId}`,
