@@ -1,4 +1,5 @@
 import { getBackendUrl } from "@/config/envConfig";
+import { notFound } from "next/navigation";
 
 type BookingPayload = {
   fullName: string;
@@ -35,8 +36,12 @@ export default function useBooking() {
       },
     ).then((res) => res.json());
 
-    if (!response.success) {
-      throw response;
+    if (!response?.success && response?.err?.statusCode === 404) {
+      return notFound();
+    }
+
+    if (!response.success && response.err?.statusCode !== 404) {
+      throw new Error(response.message);
     }
 
     return response;
@@ -51,10 +56,6 @@ export default function useBooking() {
       },
       body: JSON.stringify(data.payload),
     }).then((res) => res.json());
-
-    if (!response.ok) {
-      throw response;
-    }
 
     return response;
   };

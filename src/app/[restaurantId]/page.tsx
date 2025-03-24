@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import BookingForm from "./_components/BookingForm";
 import { getBackendUrl } from "@/config/envConfig";
 
@@ -17,7 +18,11 @@ async function fetchRestaurant(restaurantId: string) {
     },
   ).then((res) => res.json());
 
-  if (!result.success) {
+  if (!result?.success && result?.err?.statusCode === 404) {
+    return notFound();
+  }
+
+  if (!result.success && result.err?.statusCode !== 404) {
     throw new Error(result.message);
   }
 
