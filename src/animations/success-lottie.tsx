@@ -1,7 +1,11 @@
 "use client";
 
 import successAnimation from "@/assets/lottie/check-mark-lottie.json";
-import Lottie from "react-lottie";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("react-lottie"), {
+  ssr: false,
+});
 
 export default function SuccessLottie() {
   const lottieSettings = {

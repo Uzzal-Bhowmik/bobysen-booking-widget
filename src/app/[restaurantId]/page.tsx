@@ -11,7 +11,7 @@ type PageProps = {
 
 export const revalidate = 3600;
 
-async function fetchRestaurant(restaurantId: string) {
+export async function fetchRestaurant(restaurantId: string) {
   const result = await fetch(
     (getBackendUrl() as string) + `/restaurants/${restaurantId}`,
     {
@@ -42,12 +42,12 @@ export async function generateMetadata({ params }: PageProps) {
       description: `Book your table at ${restaurant.name}`,
       images:
         restaurant?.images?.length > 0
-          ? restaurant?.images?.map((image) => ({
-              url: image.url,
+          ? {
+              url: restaurant?.images[0]?.url,
               width: 1200,
               height: 630,
               alt: restaurant.name,
-            }))
+            }
           : [],
     },
   };

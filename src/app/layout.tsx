@@ -49,11 +49,14 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
 
-      <body className={`${poppins.className} antialiased`}>
+      <body
+        className={`${poppins.className} flex flex-col justify-between antialiased`}
+      >
         <Providers>
-          <main className="mx-auto max-w-6xl">{children}</main>
-          <Footer />
+          <main className="mx-auto max-w-6xl flex-1">{children}</main>
         </Providers>
+
+        <Footer />
 
         <BgFlowers />
       </body>
