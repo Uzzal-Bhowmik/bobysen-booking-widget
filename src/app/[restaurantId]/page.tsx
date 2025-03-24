@@ -42,12 +42,14 @@ export async function generateMetadata({ params }: PageProps) {
       description: `Book your table at ${restaurant.name}`,
       images:
         restaurant?.images?.length > 0
-          ? {
-              url: restaurant?.images[0]?.url,
-              width: 1200,
-              height: 630,
-              alt: restaurant.name,
-            }
+          ? [
+              {
+                url: restaurant?.images[0]?.url,
+                width: 1200,
+                height: 630,
+                alt: restaurant.name,
+              },
+            ]
           : [],
     },
   };
