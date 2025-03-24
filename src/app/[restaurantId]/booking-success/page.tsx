@@ -1,6 +1,5 @@
 import SuccessLottie from "@/animations/success-lottie";
 import { Button } from "@/components/ui/button";
-import * as motion from "motion/react-client";
 import Link from "next/link";
 
 interface PageProps {
@@ -17,24 +16,7 @@ const page: React.FC<PageProps> = async ({ params }) => {
       <SuccessLottie />
 
       <div className="flex-center -mt-4 text-center">
-        <motion.div
-          initial={{
-            y: 100,
-            opacity: 0,
-          }}
-          animate={{
-            y: 0,
-            opacity: 1,
-          }}
-          transition={{
-            delay: 2.2,
-            type: "spring",
-            stiffness: 250,
-            damping: 30,
-            mass: 0.2,
-          }}
-          className="max-h-fit overflow-hidden"
-        >
+        <div className="animate-in max-h-fit overflow-hidden delay-[2500ms]">
           <h2 className="text-primary-orange text-secondary-3 text-5xl font-bold">
             Congratulations!
           </h2>
@@ -53,7 +35,7 @@ const page: React.FC<PageProps> = async ({ params }) => {
               <Link href={`/${restaurantId}`}>Book More</Link>
             </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

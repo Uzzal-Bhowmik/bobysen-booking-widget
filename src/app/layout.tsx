@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { Kumbh_Sans, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import Providers from "@/lib/Providers";
 import BgFlowers from "@/components/BgFlowers";
+import Footer from "@/components/shared/Footer/Footer";
 
-const kumbhSans = Kumbh_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-kumbh-sans",
-});
 const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
@@ -20,6 +15,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Bookatable",
   description: "Book a table for your next event",
+  metadataBase: new URL("https://reservation.bookatable.mu"),
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
@@ -50,13 +49,10 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
 
-      <body
-        className={`${kumbhSans.variable} ${poppins.className} antialiased`}
-      >
-        <Header />
-
+      <body className={`${poppins.className} antialiased`}>
         <Providers>
           <main className="mx-auto max-w-6xl">{children}</main>
+          <Footer />
         </Providers>
 
         <BgFlowers />

@@ -5,7 +5,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-kumbh-sans: var(--font-kumbh-sans);
   --color-primary-white-light: #feffff;
   --color-primary-white-dark: #babcbd;
   --color-secondary-1: #334a55;

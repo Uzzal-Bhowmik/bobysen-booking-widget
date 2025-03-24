@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import BookingForm from "./_components/BookingForm";
 import { getBackendUrl } from "@/config/envConfig";
+import { TRestaurant } from "@/types";
 
 type PageProps = {
   params: Promise<{
@@ -31,14 +32,23 @@ async function fetchRestaurant(restaurantId: string) {
 
 export async function generateMetadata({ params }: PageProps) {
   const { restaurantId } = await params;
-  const restaurant = await fetchRestaurant(restaurantId);
+  const restaurant: TRestaurant = (await fetchRestaurant(restaurantId))?.data;
 
   return {
-    title: `${restaurant.data.name} | BookaTable`,
-    description: `Book your table at ${restaurant.data.name}`,
+    title: `${restaurant.name} | BookaTable`,
+    description: `Book your table at ${restaurant.name}`,
     openGraph: {
-      title: `${restaurant.data.name} | BookaTable`,
-      description: `Book your table at ${restaurant.data.name}`,
+      title: `${restaurant.name} | BookaTable`,
+      description: `Book your table at ${restaurant.name}`,
+      images:
+        restaurant?.images?.length > 0
+          ? restaurant?.images?.map((image) => ({
+              url: image.url,
+              width: 1200,
+              height: 630,
+              alt: restaurant.name,
+            }))
+          : [],
     },
   };
 }
@@ -48,7 +58,7 @@ export default async function BookRestaurant({ params }: PageProps) {
   const restaurant = await fetchRestaurant(restaurantId);
 
   return (
-    <div className="mt-6 mb-10">
+    <div className="my-8">
       <BookingForm restaurant={restaurant?.data} />
     </div>
   );

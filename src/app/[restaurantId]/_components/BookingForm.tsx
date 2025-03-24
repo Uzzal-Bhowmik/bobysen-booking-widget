@@ -38,8 +38,6 @@ type BookingFormProps = {
   restaurant: TRestaurant;
 };
 
-// Motion Variants
-
 // Zod validation schema
 const formSchema = z.object({
   firstName: z
@@ -48,7 +46,9 @@ const formSchema = z.object({
       message: "First name is required",
     })
     .min(1, "First name is required"),
-  lastName: z.string().optional(),
+  lastName: z
+    .string({ required_error: "Last name is required" })
+    .min(1, "Last name is required"),
   email: z
     .string({ required_error: "Email is required" })
     .min(1, "Email is required")
@@ -140,7 +140,7 @@ export default function BookingForm({ restaurant }: BookingFormProps) {
   };
 
   return (
-    <div className="space-y-3 rounded-lg border bg-white p-6 shadow-xl duration-700 lg:space-y-7">
+    <div className="space-y-3 rounded-lg border bg-white p-6 shadow-lg duration-700 lg:space-y-7">
       <div className="!mb-10 space-y-1.5 text-center">
         <h3 className="text-secondary-1 text-[30px] font-bold text-balance">
           Welcome to{" "}
@@ -190,6 +190,7 @@ export default function BookingForm({ restaurant }: BookingFormProps) {
                 <FormLabelWithOptionalitySuffix
                   htmlFor="lastName"
                   className="mb-0.5"
+                  isOptional={false}
                 >
                   Last Name
                 </FormLabelWithOptionalitySuffix>
