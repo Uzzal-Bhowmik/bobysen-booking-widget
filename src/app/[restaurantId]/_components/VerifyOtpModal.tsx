@@ -46,11 +46,6 @@ const VerifyOtpModal: React.FC<VerifyOtpModalProps> = ({
   // Get phone number from session storage
   const confirmBookingPayload = getFromSessionStorage("booking_payload");
 
-  // Focus input of mount
-  useEffect(() => {
-    setOpen(true);
-  }, []);
-
   // Handle verify otp
   const { confirmBooking } = useBooking();
   const handleVerifyOtp = async () => {
