@@ -223,7 +223,7 @@ export default function BookingForm({ restaurant }: BookingFormProps) {
                   <Input
                     type="email"
                     className="border-secondary-2/50"
-                    placeholder="Enter your first name"
+                    placeholder="Enter your email"
                     {...field}
                   />
                 </FormControl>
