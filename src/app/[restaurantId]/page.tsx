@@ -19,12 +19,11 @@ export async function fetchRestaurant(restaurantId: string) {
     },
   ).then((res) => res.json());
 
-  if (!result?.success && result?.err?.statusCode === 404) {
+  if (!result?.success) {
+    console.log("error fetching restaurant ===============>", {
+      error: result,
+    });
     return notFound();
-  }
-
-  if (!result.success && result.err?.statusCode !== 404) {
-    throw new Error(result.message);
   }
 
   return result;

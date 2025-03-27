@@ -1,5 +1,5 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +32,10 @@ interface VerifyOtpModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const VerifyOtpModal: React.FC<VerifyOtpModalProps> = ({ open, setOpen }) => {
+const VerifyOtpModal: React.FC<VerifyOtpModalProps> = ({
+  open = true,
+  setOpen,
+}) => {
   const [otp, setOtp] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -42,6 +45,11 @@ const VerifyOtpModal: React.FC<VerifyOtpModalProps> = ({ open, setOpen }) => {
 
   // Get phone number from session storage
   const confirmBookingPayload = getFromSessionStorage("booking_payload");
+
+  // Focus input of mount
+  useEffect(() => {
+    setOpen(true);
+  }, []);
 
   // Handle verify otp
   const { confirmBooking } = useBooking();
@@ -105,30 +113,22 @@ const VerifyOtpModal: React.FC<VerifyOtpModalProps> = ({ open, setOpen }) => {
             <span className="font-semibold">5 minutes</span>.
           </AlertDialogDescription>
 
-          <div className="mt-2">
+          <div className="mt-2 w-max">
             <InputOTP
               maxLength={4}
               value={otp}
               onChange={(value) => setOtp(value)}
               pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+              autoFocus
             >
               <InputOTPGroup>
-                <InputOTPSlot
-                  index={0}
-                  className="size-10 border-black/25 text-xl font-bold shadow-none"
-                />
-                <InputOTPSlot
-                  index={1}
-                  className="size-10 border-black/25 text-xl font-bold shadow-none"
-                />
-                <InputOTPSlot
-                  index={2}
-                  className="size-10 border-black/25 text-xl font-bold shadow-none"
-                />
-                <InputOTPSlot
-                  index={3}
-                  className="size-10 border-black/25 text-xl font-bold shadow-none"
-                />
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <InputOTPSlot
+                    key={index}
+                    index={index}
+                    className="size-11 border-black/25 text-xl font-bold shadow-none"
+                  />
+                ))}
               </InputOTPGroup>
             </InputOTP>
           </div>

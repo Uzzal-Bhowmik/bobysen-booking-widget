@@ -36,6 +36,8 @@ export default function useBooking() {
       },
     ).then((res) => res.json());
 
+    console.log(response?.err?.statusCode);
+
     if (!response?.success && response?.err?.statusCode === 404) {
       return notFound();
     }
